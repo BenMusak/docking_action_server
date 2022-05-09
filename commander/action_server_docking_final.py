@@ -206,9 +206,9 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
 
     w, h, __ = img.shape
 
-    print('0', arucoAng[0])
-    print('1', arucoAng[1])
-    print('2', arucoAng[2])
+    print('0', arucoAng[0] * (180.0/3.14159))
+    print('1', arucoAng[1] * (180.0/3.14159))
+    print('2', arucoAng[2] * (180.0/3.14159))
 
         
     # Adjust X angle with a adjustable deadzone
@@ -313,7 +313,7 @@ def moveForward(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, 0.0)
     minimal_publisher.linearVec = (driveSpeed, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
-    #print("Moving forward with: " + str(driveSpeed) + "m/s.")
+    print("Moving forward with: " + str(driveSpeed) + "m/s.")
 
 
 def main(args=None):
