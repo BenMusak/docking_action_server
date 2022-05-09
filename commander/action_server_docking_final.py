@@ -225,10 +225,10 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
             completedDocking[0] = False
 
         # Prouder adjustments
-        elif arucoAng[0] > 0 and angleDiff > -5 and distanceZ > 0.6: 
+        elif arucoAng[0] > 0 and angleDiff > -4 and distanceZ > 0.6: 
             turnRight(minimal_publisher)
             completedDocking[0] = False  
-        elif arucoAng[0] < 0 and angleDiff < -5 and distanceZ > 0.6:
+        elif arucoAng[0] < 0 and angleDiff < -4 and distanceZ > 0.6:
             turnLeft(minimal_publisher)
             completedDocking[0] = False
         else:
@@ -257,10 +257,10 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         
         cv2.putText(img, "Distance Z: " + str(distance), (0, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))
 
-        if distance < -0.8: 
+        if distance < -0.10: 
             moveForward(minimal_publisher)
             completedDocking[2] = False
-        elif distance > 0.8:
+        elif distance > 0.1:
             moveForward(minimal_publisher)
             completedDocking[2] = False
         else:
