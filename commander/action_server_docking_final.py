@@ -205,15 +205,10 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
     arucoPos = [tvecs[0][0][0], tvecs[0][0][1], tvecs[0][0][2]]
 
     w, h, __ = img.shape
-
-    print('0', arucoAng[0] * (180.0/3.14159))
-    print('1', arucoAng[1] * (180.0/3.14159))
-    print('2', arucoAng[2] * (180.0/3.14159))
-
         
     # Adjust X angle with a adjustable deadzone
-    if arucoAng[0] is not targetDockingAng[2]:
-        degrees = arucoAng[0] * (180.0/3.14159)
+    if arucoAng[2] is not targetDockingAng[2]:
+        degrees = arucoAng[2] * (180.0/3.14159)
         angleDiff = degrees - targetDockingAng[2]
         distanceZ = arucoPos[2] - targetDockingPos[2]
         
@@ -222,18 +217,18 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         # Make it so that the angeldifference decreases with the distance between the marker and robot
 
         # Precise adjustments
-        if angleDiff > -127 and angleDiff < 0 and distanceZ < 0.6: 
+        if arucoAng[0] > 0 and angleDiff > -5 and distanceZ < 0.6: 
             turnRight(minimal_publisher)
             completedDocking[0] = False
-        elif angleDiff < 127 and angleDiff > 0 and distanceZ < 0.6:
+        elif arucoAng[0] < 0 and angleDiff < -5 and distanceZ < 0.6:
             turnLeft(minimal_publisher)
             completedDocking[0] = False
 
         # Prouder adjustments
-        elif angleDiff > -120 and angleDiff < 0 and distanceZ > 0.6: 
+        elif arucoAng[0] > 0 and angleDiff > -5 and distanceZ > 0.6: 
             turnRight(minimal_publisher)
             completedDocking[0] = False  
-        elif angleDiff < 120 and angleDiff > 0 and distanceZ > 0.6:
+        elif arucoAng[0] < 0 and angleDiff < -5 and distanceZ > 0.6:
             turnLeft(minimal_publisher)
             completedDocking[0] = False
         else:
@@ -285,28 +280,28 @@ def turnRight(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, -turnSpeed)
     minimal_publisher.linearVec = (0.0, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
-    #print("Turning right with: " + str(-turnSpeed) + "rad/s.")
+    print("Turning right with: " + str(-turnSpeed) + "rad/s.")
 
 
 def turnLeft(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, turnSpeed)
     minimal_publisher.linearVec = (0.0, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
-    #print("Turning left with: " + str(turnSpeed) + "rad/s.")
+    print("Turning left with: " + str(turnSpeed) + "rad/s.")
 
 
 def driveRight(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, 0.0)
     minimal_publisher.linearVec = (0.0, driveSpeed, 0.0)
     rclpy.spin_once(minimal_publisher)
-    #print("Moving right with: " + str(driveSpeed) + "m/s.")
+    print("Moving right with: " + str(driveSpeed) + "m/s.")
 
 
 def driveLeft(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, 0.0)
     minimal_publisher.linearVec = (0.0, -driveSpeed, 0.0)
     rclpy.spin_once(minimal_publisher)
-    #print("Moving left with: " + str(driveSpeed) + "m/s.")
+    print("Moving left with: " + str(driveSpeed) + "m/s.")
 
 
 def moveForward(minimal_publisher):
