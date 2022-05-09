@@ -206,6 +206,10 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
 
     w, h, __ = img.shape
 
+    print('0', arucoAng[0])
+    print('1', arucoAng[1])
+    print('2', arucoAng[2])
+
         
     # Adjust X angle with a adjustable deadzone
     if arucoAng[0] is not targetDockingAng[2]:
@@ -281,35 +285,35 @@ def turnRight(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, -turnSpeed)
     minimal_publisher.linearVec = (0.0, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
-    print("Turning right with: " + str(-turnSpeed) + "rad/s.")
+    #print("Turning right with: " + str(-turnSpeed) + "rad/s.")
 
 
 def turnLeft(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, turnSpeed)
     minimal_publisher.linearVec = (0.0, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
-    print("Turning left with: " + str(turnSpeed) + "rad/s.")
+    #print("Turning left with: " + str(turnSpeed) + "rad/s.")
 
 
 def driveRight(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, 0.0)
     minimal_publisher.linearVec = (0.0, driveSpeed, 0.0)
     rclpy.spin_once(minimal_publisher)
-    print("Moving right with: " + str(driveSpeed) + "m/s.")
+    #print("Moving right with: " + str(driveSpeed) + "m/s.")
 
 
 def driveLeft(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, 0.0)
     minimal_publisher.linearVec = (0.0, -driveSpeed, 0.0)
     rclpy.spin_once(minimal_publisher)
-    print("Moving left with: " + str(driveSpeed) + "m/s.")
+    #print("Moving left with: " + str(driveSpeed) + "m/s.")
 
 
 def moveForward(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, 0.0)
     minimal_publisher.linearVec = (driveSpeed, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
-    print("Moving forward with: " + str(driveSpeed) + "m/s.")
+    #print("Moving forward with: " + str(driveSpeed) + "m/s.")
 
 
 def main(args=None):
