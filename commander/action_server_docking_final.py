@@ -209,7 +209,7 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         
     # Adjust X angle with a adjustable deadzone
     if arucoAng[0] is not targetDockingAng[2]:
-        degrees = arucoAng[1] * (180.0/3.14159)
+        degrees = arucoAng[0] * (180.0/3.14159)
         angleDiff = degrees - targetDockingAng[2]
         distanceZ = arucoPos[2] - targetDockingPos[2]
         
