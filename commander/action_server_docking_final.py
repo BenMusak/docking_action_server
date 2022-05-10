@@ -285,10 +285,10 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         # Precise adjustments
         if distanceZ < 0.3:
             if distance < -0.07: 
-                moveForward(minimal_publisher, speed=driveSpeed/2)
+                moveForward(minimal_publisher, speed=driveSpeed/4)
                 completedDocking[2] = False
             elif distance > 0.07:
-                moveForward(minimal_publisher, speed=driveSpeed/2)
+                moveForward(minimal_publisher, speed=driveSpeed/4)
                 completedDocking[2] = False
             else:
                 completedDocking[2] = True
@@ -333,7 +333,7 @@ def driveLeft(minimal_publisher):
 
 def moveForward(minimal_publisher, speed = driveSpeed):
     minimal_publisher.angularVec = (0.0, 0.0, 0.0)
-    minimal_publisher.linearVec = (driveSpeed, 0.0, 0.0)
+    minimal_publisher.linearVec = (speed, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
     print("Moving forward with: " + str(driveSpeed) + "m/s.")
 
