@@ -217,10 +217,10 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         # Make it so that the angeldifference decreases with the distance between the marker and robot
 
         # Precise adjustments
-        if arucoAng[0] > 0 and angleDiff < -2 and distanceZ < 0.3: 
+        if arucoAng[0] > 0 and angleDiff < -1 and distanceZ < 0.3: 
             turnRight(minimal_publisher)
             completedDocking[0] = False
-        elif arucoAng[0] <= 0 and angleDiff < -2 and distanceZ < 0.3:
+        elif arucoAng[0] <= 0 and angleDiff < -1 and distanceZ < 0.3:
             turnLeft(minimal_publisher)
             completedDocking[0] = False
 
