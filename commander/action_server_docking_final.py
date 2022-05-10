@@ -74,7 +74,7 @@ class DockingActionServer(Node):
                 if foundArucosMarkers > 0:
                     aruco.drawDetectedMarkers(img, foundArucos[0], foundArucos[1])
                     counter = 0
-                    rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(foundArucos[0], 0.064, mtx, dist) # Aruco markers length are given in meters
+                    rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(foundArucos[0], 0.048, mtx, dist) # Aruco markers length are given in meters
 
                     hasSeenAruco = False
                     for bbox, id in zip(foundArucos[0], foundArucos[1]):
