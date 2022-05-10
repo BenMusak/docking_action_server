@@ -261,7 +261,7 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
             moveForward(minimal_publisher)
             completedDocking[2] = False
         elif distance >= 0.07 and distance <= 0.3:
-            moveForward(minimal_publisher, speed=driveSpeed/2)
+            moveForward(minimal_publisher, speed=driveSpeed/4)
             completedDocking[2] = False
         else:
             completedDocking[2] = True
