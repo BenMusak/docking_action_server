@@ -216,23 +216,25 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         
         # Make it so that the angeldifference decreases with the distance between the marker and robot
 
-        # Precise adjustments
-        if arucoAng[0] > 0 and angleDiff < -3 and distanceZ < 0.3: 
-            turnRight(minimal_publisher)
-            completedDocking[0] = False
-        elif arucoAng[0] < 0 and angleDiff < -3 and distanceZ < 0.3:
-            turnLeft(minimal_publisher)
-            completedDocking[0] = False
-
         # Prouder adjustments
-        elif arucoAng[0] > 0 and angleDiff < -10 and distanceZ > 0.3: 
-            turnRight(minimal_publisher)
-            completedDocking[0] = False  
-        elif arucoAng[0] < 0 and angleDiff < -10 and distanceZ > 0.3:
-            turnLeft(minimal_publisher)
-            completedDocking[0] = False
-        else:
-            completedDocking[0] = True
+        if distanceZ > 0.3:
+            if arucoAng[0] > 0 and angleDiff < -10:
+                turnRight(minimal_publisher)
+                completedDocking[0] = False  
+            elif arucoAng[0] < 0 and angleDiff < -10:
+                turnLeft(minimal_publisher)
+                completedDocking[0] = False
+            else:
+                completedDocking[0] = True
+        
+        # Precise adjustments
+        if distanceZ < 0.3:
+            if arucoAng[0] > 0 and angleDiff < -2:
+                turnRight(minimal_publisher)
+                completedDocking[0] = False
+            elif arucoAng[0] < 0 and angleDiff < -2:
+                turnLeft(minimal_publisher)
+                completedDocking[0] = False
 
     
     # Adjust X position with a 10 cm deadzone
@@ -241,15 +243,27 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         
         cv2.putText(img, "Distance X: " + str(distance), (0, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))
 
-        if distance < -0.02: 
-            driveRight(minimal_publisher)
-            completedDocking[1] = False
-        elif distance > 0.02:
-            driveLeft(minimal_publisher)
-            completedDocking[1] = False
-        else:
-            completedDocking[1] = True
-
+        # Prouder adjustments
+        if distanceZ > 0.3:
+            if distance < -0.05: 
+                driveRight(minimal_publisher)
+                completedDocking[1] = False
+            elif distance > 0.05:
+                driveLeft(minimal_publisher)
+                completedDocking[1] = False
+            else:
+                completedDocking[1] = True
+        
+        # Precise adjustments
+        if distanceZ < 0.3:
+            if distance < -0.02: 
+                driveRight(minimal_publisher)
+                completedDocking[1] = False
+            elif distance > 0.02:
+                driveLeft(minimal_publisher)
+                completedDocking[1] = False
+            else:
+                completedDocking[1] = True
 
     # Finally adjust Z position with a 10 cm deadzone
     if arucoPos[2] is not rvecs[0][0][2] and completedDocking[1] and completedDocking[0]:
@@ -257,14 +271,27 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         
         cv2.putText(img, "Distance Z: " + str(distance), (0, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))
 
-        if distance < -0.07: 
-            moveForward(minimal_publisher)
-            completedDocking[2] = False
-        elif distance > 0.07:
-            moveForward(minimal_publisher)
-            completedDocking[2] = False
-        else:
-            completedDocking[2] = True
+        # Prouder adjustments
+        if distanceZ > 0.3:
+            if distance < -0.07: 
+                moveForward(minimal_publisher)
+                completedDocking[2] = False
+            elif distance > 0.07:
+                moveForward(minimal_publisher)
+                completedDocking[2] = False
+            else:
+                completedDocking[2] = True
+        
+        # Precise adjustments
+        if distanceZ < 0.3:
+            if distance < -0.07: 
+                moveForward(minimal_publisher, speed=driveSpeed/2)
+                completedDocking[2] = False
+            elif distance > 0.07:
+                moveForward(minimal_publisher, speed=driveSpeed/2)
+                completedDocking[2] = False
+            else:
+                completedDocking[2] = True
 
     if completedDocking[0] and completedDocking[1] and completedDocking[2]:
         startFeeder(img, 2, dockingActionServer, goal_handle, result)
@@ -304,7 +331,7 @@ def driveLeft(minimal_publisher):
     print("Moving left with: " + str(driveSpeed) + "m/s.")
 
 
-def moveForward(minimal_publisher):
+def moveForward(minimal_publisher, speed = driveSpeed):
     minimal_publisher.angularVec = (0.0, 0.0, 0.0)
     minimal_publisher.linearVec = (driveSpeed, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
