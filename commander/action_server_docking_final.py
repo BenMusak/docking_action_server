@@ -333,7 +333,7 @@ def driveLeft(minimal_publisher):
 
 def moveForward(minimal_publisher, speed = driveSpeed):
     minimal_publisher.angularVec = (0.0, 0.0, 0.0)
-    minimal_publisher.linearVec = (speed, 0.0, 0.0)
+    minimal_publisher.linearVec = (driveSpeed, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
     print("Moving forward with: " + str(driveSpeed) + "m/s.")
 
