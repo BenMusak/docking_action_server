@@ -217,18 +217,18 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         # Make it so that the angeldifference decreases with the distance between the marker and robot
 
         # Precise adjustments
-        if arucoAng[0] > 0 and angleDiff < -4 and distanceZ < 0.6: 
+        if arucoAng[0] > 0 and angleDiff < -3 and distanceZ < 0.3: 
             turnRight(minimal_publisher)
             completedDocking[0] = False
-        elif arucoAng[0] < 0 and angleDiff < -4 and distanceZ < 0.6:
+        elif arucoAng[0] < 0 and angleDiff < -3 and distanceZ < 0.3:
             turnLeft(minimal_publisher)
             completedDocking[0] = False
 
         # Prouder adjustments
-        elif arucoAng[0] > 0 and angleDiff < -10 and distanceZ > 0.6: 
+        elif arucoAng[0] > 0 and angleDiff < -10 and distanceZ > 0.3: 
             turnRight(minimal_publisher)
             completedDocking[0] = False  
-        elif arucoAng[0] < 0 and angleDiff < -10 and distanceZ > 0.6:
+        elif arucoAng[0] < 0 and angleDiff < -10 and distanceZ > 0.3:
             turnLeft(minimal_publisher)
             completedDocking[0] = False
         else:
@@ -257,10 +257,10 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         
         cv2.putText(img, "Distance Z: " + str(distance), (0, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))
 
-        if distance < -0.05: 
+        if distance < -0.07: 
             moveForward(minimal_publisher)
             completedDocking[2] = False
-        elif distance > 0.05:
+        elif distance > 0.07:
             moveForward(minimal_publisher)
             completedDocking[2] = False
         else:
