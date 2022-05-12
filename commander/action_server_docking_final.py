@@ -257,10 +257,10 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         
         #cv2.putText(img, "Distance Z: " + str(distance), (0, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))
 
-        if distance > 0.07 and distance > 0.3:
+        if distance > 0.11 and distance > 0.3:
             moveForward(minimal_publisher)
             completedDocking[2] = False
-        elif distance >= 0.07 and distance <= 0.3:
+        elif distance >= 0.11 and distance <= 0.3:
             moveForward(minimal_publisher, speed=driveSpeed/4)
             completedDocking[2] = False
         else:
