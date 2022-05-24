@@ -90,8 +90,8 @@ class DockingActionServer(Node):
                     print("No Aruco markers found")
                     searchForAruco(minimal_publisher)
             
-                cv2.imshow("Aruco Markers", img)
-                cv2.waitKey(1)
+                #cv2.imshow("Aruco Markers", img)
+                #cv2.waitKey(1)
 
                 if self.dockSucced:
                     goal_handle.succeed()
@@ -212,7 +212,7 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         angleDiff = degrees - targetDockingAng[2]
         distanceZ = arucoPos[2] - targetDockingPos[2]
         
-        cv2.putText(img, "Angle: " + str(angleDiff), (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))
+        #cv2.putText(img, "Angle: " + str(angleDiff), (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))
         
         # Make it so that the angeldifference decreases with the distance between the marker and robot
 
@@ -239,7 +239,7 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
     if arucoPos[0] is not rvecs[0][0][0] and completedDocking[0]:
         distance = arucoPos[0] - targetDockingPos[0]
         
-        cv2.putText(img, "Distance X: " + str(distance), (0, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))
+        #cv2.putText(img, "Distance X: " + str(distance), (0, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))
 
         if distance < -0.03:
             driveRight(minimal_publisher)
@@ -257,7 +257,7 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
     if arucoPos[2] is not rvecs[0][0][2] and completedDocking[1] and completedDocking[0]:
         distance = arucoPos[2] - targetDockingPos[2]
         
-        cv2.putText(img, "Distance Z: " + str(distance), (0, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))
+        #cv2.putText(img, "Distance Z: " + str(distance), (0, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))
 
         if distance > 0.11 and distance > 0.3:
             moveForward(minimal_publisher)
