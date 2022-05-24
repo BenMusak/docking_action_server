@@ -13,7 +13,7 @@ from geometry_msgs.msg import Vector3Stamped
 ownMarkerID = 1
 arucoIDSearcher = 0
 turnSpeed = 0.15
-driveSpeed = 0.05
+driveSpeed = 0.10
 #startDocking = False
 
 directionLookLeft = False
@@ -244,6 +244,8 @@ def controlDocking(minimal_publisher,img, rvecs, tvecs, dockingActionServer, goa
         if distance < -0.03:
             driveRight(minimal_publisher)
             completedDocking[1] = False
+
+ 
         elif distance >= 0.00:
             driveLeft(minimal_publisher)
             completedDocking[1] = False
