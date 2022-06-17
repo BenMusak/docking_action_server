@@ -28,9 +28,9 @@ startSearch = True
 targetDockingPos = [0, 0, 0.10] # given in meters
 targetDockingAng = [0, 0, 0] # Given in degreess
 completedDocking = False
-maxSpeedZ = 0.1
-maxSpeedX = 0.1
-maxTurnSpeed = 0.1
+maxSpeedZ = 0.05
+maxSpeedX = 0.05
+maxTurnSpeed = 0.05
 
 # PID variables
 integral, derivative, last_error = 0, 0, 0
@@ -205,14 +205,14 @@ def turnRight(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, -turnSpeed)
     minimal_publisher.linearVec = (0.0, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
-    print("Turning right with: " + str(-turnSpeed) + "rad/s.")
+    #print("Turning right with: " + str(-turnSpeed) + "rad/s.")
 
 
 def turnLeft(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, turnSpeed)
     minimal_publisher.linearVec = (0.0, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
-    print("Turning left with: " + str(turnSpeed) + "rad/s.")
+    #print("Turning left with: " + str(turnSpeed) + "rad/s.")
 
 
 # PID function
@@ -259,6 +259,9 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
 
     if angleDiff > targetDockingAng[2] or pid_distanceX > targetDockingPos[0] or pid_distanceZ > targetDockingPos[2]:
         minimal_publisher.angularVec = (0.0, 0.0, turnSpeedZ)
+        print("turnSpeedZ: ", turnSpeedZ)
+        print("driveSpeedX: ", driveSpeedX)
+        print("driveSpeedZ: ", driveSpeedZ)
         minimal_publisher.linearVec = (abs(driveSpeedX), 0.0, abs(driveSpeedZ))
         rclpy.spin_once(minimal_publisher)
     else:
