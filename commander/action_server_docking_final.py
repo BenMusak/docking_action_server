@@ -88,7 +88,7 @@ class DockingActionServer(Node):
                         counter += 1
                         
                         if id == self.arucoMarkerID:
-                            controlDocking(minimal_publisher, img, rvecs, tvecs, self, goal_handle, result)
+                            controlDocking(minimal_publisher, rvecs, tvecs)
                             hasSeenAruco = True
                         elif id is not self.arucoMarkerID and not hasSeenAruco:
                             searchForAruco(minimal_publisher)
