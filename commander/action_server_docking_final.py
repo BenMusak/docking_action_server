@@ -30,7 +30,7 @@ targetDockingAng = [0, 0, 0] # Given in degreess
 completedDocking = False
 maxSpeedZ = 0.07
 maxSpeedX = 0.07
-maxTurnSpeed = 0.07
+maxTurnSpeed = 0.10
 
 # PID variables
 integral, derivative, last_error = 0, 0, 0
@@ -237,8 +237,10 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
 
     # Adjust Z angle
     degrees = arucoAng[2] * (180.0/3.14159)
+    print("Degreess: " + str(degrees))
     angleDiff = degrees - targetDockingAng[2]
     pid_angleDiff = PID(angleDiff, 0.5, 0.1, 0.1)
+    print("PID angle diff: " + str(pid_angleDiff))
     turnSpeedZ = pid_angleDiff
     if turnSpeedZ > maxTurnSpeed:
         turnSpeedZ = maxTurnSpeed
@@ -263,9 +265,9 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
 
     if angleDiff > targetDockingAng[2] or pid_distanceX > targetDockingPos[0] or pid_distanceZ > targetDockingPos[2]:
         minimal_publisher.angularVec = (0.0, 0.0, -turnSpeedZ)
-        print("turnSpeedZ: ", turnSpeedZ)
-        print("driveSpeedX: ", driveSpeedX)
-        print("driveSpeedZ: ", driveSpeedZ)
+        #print("turnSpeedZ: ", turnSpeedZ)
+        #print("driveSpeedX: ", driveSpeedX)
+        #print("driveSpeedZ: ", driveSpeedZ)
         #minimal_publisher.linearVec = (driveSpeedZ, driveSpeedX, 0.0)
         rclpy.spin_once(minimal_publisher)
     else:
