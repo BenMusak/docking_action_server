@@ -239,7 +239,7 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
     degrees = arucoAng[0] * (180.0/3.14159)
     print("Degreess: " + str(degrees))
     angleDiff = degrees - targetDockingAng[2]
-    pid_angleDiff = PID(angleDiff, 1.0, 0.1, 0.1)
+    pid_angleDiff = PID(angleDiff, 0.01, 0.1, 0.1)
     print("PID angle diff: " + str(pid_angleDiff))
     turnSpeedZ = pid_angleDiff
     if turnSpeedZ > maxTurnSpeed:
