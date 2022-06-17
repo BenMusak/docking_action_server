@@ -28,6 +28,9 @@ startSearch = True
 targetDockingPos = [0, 0, 0.10] # given in meters
 targetDockingAng = [0, 0, 0] # Given in degreess
 completedDocking = False
+maxSpeedZ = 1.5
+maxSpeedX = 1.0
+maxTurnSpeed = 1.0
 
 # PID variables
 integral, derivative, last_error = 0, 0, 0
@@ -237,16 +240,22 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
     angleDiff = degrees - targetDockingAng[2]
     pid_angleDiff = PID(angleDiff, 0.5, 0.1, 0.1)
     turnSpeedZ = pid_angleDiff
+    if turnSpeedZ > maxTurnSpeed:
+        turnSpeedZ = maxTurnSpeed
 
     # Adjust x position
     distanceX = arucoPos[0] - targetDockingPos[0]
     pid_distanceX = PID(distanceX, 0.3, 0.1, 0.1)
     driveSpeedX = pid_distanceX
+    if driveSpeedX > maxSpeedX:
+        driveSpeedX = maxSpeedX
 
     # Adjust z position 
     distanceZ = arucoPos[2] - targetDockingPos[2]
     pid_distanceZ = PID(distanceZ, 0.3, 0.1, 0.1)
     driveSpeedZ = pid_distanceZ
+    if driveSpeedZ > maxSpeedZ:
+        driveSpeedZ = maxSpeedZ
 
     if angleDiff > targetDockingAng[2] or pid_distanceX > targetDockingPos[0] or pid_distanceZ > targetDockingPos[2]:
         minimal_publisher.angularVec = (0.0, 0.0, -turnSpeedZ)
@@ -254,10 +263,10 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
         rclpy.spin_once(minimal_publisher)
     else:
         print("Completed docking d8)")
-        startFeeder(dockingActionServer)
+        #startFeeder(dockingActionServer)
 
 def startFeeder(dockingActionServer):
-    dockingActionServer.dockSucced = True
+    #dockingActionServer.dockSucced = True
     print('Docked!')
 
 
