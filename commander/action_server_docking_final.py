@@ -28,9 +28,9 @@ startSearch = True
 targetDockingPos = [0, 0, 0.10] # given in meters
 targetDockingAng = [0, 0, 0] # Given in degreess
 completedDocking = False
-maxSpeedZ = 0.05
-maxSpeedX = 0.05
-maxTurnSpeed = 0.05
+maxSpeedZ = 0.07
+maxSpeedX = 0.07
+maxTurnSpeed = 0.07
 
 # PID variables
 integral, derivative, last_error = 0, 0, 0
@@ -247,10 +247,12 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
 
     # Adjust x position
     distanceX = arucoPos[0] - targetDockingPos[0]
-    pid_distanceX = abs(PID(distanceX, 0.3, 0.1, 0.1))
+    pid_distanceX = PID(distanceX, 0.3, 0.1, 0.1)
     driveSpeedX = pid_distanceX
     if driveSpeedX > maxSpeedX:
         driveSpeedX = maxSpeedX
+    elif driveSpeedX < -maxSpeedX:
+        driveSpeedX = -maxSpeedX
 
     # Adjust z position 
     distanceZ = arucoPos[2] - targetDockingPos[2]
