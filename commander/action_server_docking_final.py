@@ -88,7 +88,7 @@ class DockingActionServer(Node):
                         counter += 1
                         
                         if id == self.arucoMarkerID:
-                            controlDocking(minimal_publisher, rvecs, tvecs)
+                            controlDocking(minimal_publisher, rvecs, tvecs, self)
                             hasSeenAruco = True
                         elif id is not self.arucoMarkerID and not hasSeenAruco:
                             searchForAruco(minimal_publisher)
@@ -221,7 +221,7 @@ def PID(error, Kp, Ki, Kd):
     return Kp * error + Ki * integral + Kd * derivative
 
 
-def controlDocking(minimal_publisher, rvecs, tvecs):
+def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
 
     #https://www.google.com/search?q=how+to+use+pid+control+system+with+motor&oq=how+to+use+pid+control+system+with+motor&aqs=edge..69i57.14481j0j1&sourceid=chrome&ie=UTF-8#kpvalbx=_6MipYuTPA-2mrgT-0aSQBw36
 
@@ -255,7 +255,7 @@ def controlDocking(minimal_publisher, rvecs, tvecs):
     else:
         completedDocking = True
         print("Completed docking d8)")
-        startFeeder()
+        startFeeder(dockingActionServer)
 
 
 def startFeeder(dockingActionServer):
