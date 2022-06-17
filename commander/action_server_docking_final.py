@@ -236,7 +236,7 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
     arucoPos = [tvecs[0][0][0], tvecs[0][0][1], tvecs[0][0][2]]
 
     # Adjust Z angle
-    degrees = arucoAng[1] * (180.0/3.14159)
+    degrees = arucoAng[2] * (180.0/3.14159)
     angleDiff = degrees - targetDockingAng[2]
     pid_angleDiff = PID(angleDiff, 0.5, 0.1, 0.1)
     turnSpeedZ = pid_angleDiff
