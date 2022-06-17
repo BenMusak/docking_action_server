@@ -258,7 +258,7 @@ def controlDocking(minimal_publisher, rvecs, tvecs):
         startFeeder()
 
 
-def startFeeder(img, amount, dockingActionServer, goal_handle, result):
+def startFeeder(dockingActionServer):
     dockingActionServer.dockSucced = True
     print('Docked!')
 
