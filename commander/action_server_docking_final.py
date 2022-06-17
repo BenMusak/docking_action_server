@@ -245,14 +245,14 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
 
     # Adjust x position
     distanceX = arucoPos[0] - targetDockingPos[0]
-    pid_distanceX = PID(distanceX, 0.3, 0.1, 0.1)
+    pid_distanceX = abs(PID(distanceX, 0.3, 0.1, 0.1))
     driveSpeedX = pid_distanceX
     if driveSpeedX > maxSpeedX:
         driveSpeedX = maxSpeedX
 
     # Adjust z position 
     distanceZ = arucoPos[2] - targetDockingPos[2]
-    pid_distanceZ = PID(distanceZ, 0.3, 0.1, 0.1)
+    pid_distanceZ = abs(PID(distanceZ, 0.3, 0.1, 0.1))
     driveSpeedZ = pid_distanceZ
     if driveSpeedZ > maxSpeedZ:
         driveSpeedZ = maxSpeedZ
@@ -262,7 +262,7 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
         print("turnSpeedZ: ", turnSpeedZ)
         print("driveSpeedX: ", driveSpeedX)
         print("driveSpeedZ: ", driveSpeedZ)
-        minimal_publisher.linearVec = (abs(driveSpeedX), 0.0, abs(driveSpeedZ))
+        minimal_publisher.linearVec = (driveSpeedX, 0.0, driveSpeedZ)
         rclpy.spin_once(minimal_publisher)
     else:
         print("Completed docking d8)")
