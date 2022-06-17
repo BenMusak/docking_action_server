@@ -95,9 +95,6 @@ class DockingActionServer(Node):
                 else:
                     print("No Aruco markers found")
                     searchForAruco(minimal_publisher)
-            
-                cv2.imshow("Aruco Markers", img)
-                cv2.waitKey(1)
 
                 if self.dockSucced:
                     goal_handle.succeed()
