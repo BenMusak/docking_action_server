@@ -266,7 +266,7 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
         print("turnSpeedZ: ", turnSpeedZ)
         print("driveSpeedX: ", driveSpeedX)
         print("driveSpeedZ: ", driveSpeedZ)
-        minimal_publisher.linearVec = (driveSpeedZ, driveSpeedX, 0)
+        minimal_publisher.linearVec = (driveSpeedZ, driveSpeedX, 0.0)
         rclpy.spin_once(minimal_publisher)
     else:
         print("Completed docking d8)")
