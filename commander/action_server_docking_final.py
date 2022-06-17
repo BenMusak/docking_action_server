@@ -248,12 +248,11 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
     pid_distanceZ = PID(distanceZ, 0.3, 0.1, 0.1)
     driveSpeedZ = pid_distanceZ
 
-    if angleDiff > targetDockingAng[2] or pid_distanceX > targetDockingPos[0] or pid_distanceZ > targetDockingPos[2] or completedDocking == False:
+    if angleDiff > targetDockingAng[2] or pid_distanceX > targetDockingPos[0] or pid_distanceZ > targetDockingPos[2]:
         minimal_publisher.angularVec = (0.0, 0.0, -turnSpeedZ)
         minimal_publisher.linearVec = (driveSpeedX, 0.0, driveSpeedZ)
         rclpy.spin_once(minimal_publisher)
     else:
-        completedDocking = True
         print("Completed docking d8)")
         startFeeder(dockingActionServer)
 
