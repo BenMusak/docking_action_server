@@ -264,7 +264,7 @@ def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
         driveSpeedZ = maxSpeedZ
 
     if angleDiff > targetDockingAng[2] or pid_distanceX > targetDockingPos[0] or pid_distanceZ > targetDockingPos[2]:
-        minimal_publisher.angularVec = (0.0, pid_angleDiff, -turnSpeedZ)
+        minimal_publisher.angularVec = (pid_angleDiff, float(pid_angleDiff), -turnSpeedZ)
         #print("turnSpeedZ: ", turnSpeedZ)
         #print("driveSpeedX: ", driveSpeedX)
         #print("driveSpeedZ: ", driveSpeedZ)
