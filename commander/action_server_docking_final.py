@@ -6,6 +6,8 @@ import cv2.aruco as aruco
 import numpy as np
 
 # From import
+from rclpy.action import ActionServer
+from docking_action_server.action import Docking
 from rclpy.node import Node
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
@@ -26,6 +28,9 @@ startSearch = True
 targetDockingPos = [0, 0, 0.10] # given in meters
 targetDockingAng = [0, 0, 0] # Given in degreess
 completedDocking = False
+maxSpeedZ = 0.07
+maxSpeedX = 0.07
+maxTurnSpeed = 0.10
 
 # PID variables
 integral, derivative, last_error = 0, 0, 0
@@ -86,16 +91,13 @@ class DockingActionServer(Node):
                         counter += 1
                         
                         if id == self.arucoMarkerID:
-                            controlDocking(minimal_publisher, img, rvecs, tvecs, self, goal_handle, result)
+                            controlDocking(minimal_publisher, rvecs, tvecs, self)
                             hasSeenAruco = True
                         elif id is not self.arucoMarkerID and not hasSeenAruco:
                             searchForAruco(minimal_publisher)
                 else:
                     print("No Aruco markers found")
                     searchForAruco(minimal_publisher)
-            
-                cv2.imshow("Aruco Markers", img)
-                cv2.waitKey(1)
 
                 if self.dockSucced:
                     goal_handle.succeed()
@@ -203,14 +205,14 @@ def turnRight(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, -turnSpeed)
     minimal_publisher.linearVec = (0.0, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
-    print("Turning right with: " + str(-turnSpeed) + "rad/s.")
+    #print("Turning right with: " + str(-turnSpeed) + "rad/s.")
 
 
 def turnLeft(minimal_publisher):
     minimal_publisher.angularVec = (0.0, 0.0, turnSpeed)
     minimal_publisher.linearVec = (0.0, 0.0, 0.0)
     rclpy.spin_once(minimal_publisher)
-    print("Turning left with: " + str(turnSpeed) + "rad/s.")
+    #print("Turning left with: " + str(turnSpeed) + "rad/s.")
 
 
 # PID function
@@ -222,7 +224,7 @@ def PID(error, Kp, Ki, Kd):
     return Kp * error + Ki * integral + Kd * derivative
 
 
-def controlDocking(minimal_publisher, rvecs, tvecs):
+def controlDocking(minimal_publisher, rvecs, tvecs, dockingActionServer):
 
     #https://www.google.com/search?q=how+to+use+pid+control+system+with+motor&oq=how+to+use+pid+control+system+with+motor&aqs=edge..69i57.14481j0j1&sourceid=chrome&ie=UTF-8#kpvalbx=_6MipYuTPA-2mrgT-0aSQBw36
 
@@ -234,35 +236,47 @@ def controlDocking(minimal_publisher, rvecs, tvecs):
     arucoPos = [tvecs[0][0][0], tvecs[0][0][1], tvecs[0][0][2]]
 
     # Adjust Z angle
-    degrees = arucoAng[1] * (180.0/3.14159)
-    angleDiff = degrees - targetDockingAng[2]
-    pid_angleDiff = PID(angleDiff, 0.5, 0.1, 0.1)
+    rad = arucoAng[0]
+    print("Rad: " + str(rad))
+    angleDiff = rad - targetDockingAng[2]
+    pid_angleDiff = PID(angleDiff, 0.001, 0.1, 0.1)
+    print("PID angle diff: " + str(pid_angleDiff))
     turnSpeedZ = pid_angleDiff
+    if turnSpeedZ > maxTurnSpeed:
+        turnSpeedZ = maxTurnSpeed
+    elif turnSpeedZ < -maxTurnSpeed:
+        turnSpeedZ = -maxTurnSpeed
 
     # Adjust x position
     distanceX = arucoPos[0] - targetDockingPos[0]
     pid_distanceX = PID(distanceX, 0.3, 0.1, 0.1)
     driveSpeedX = pid_distanceX
+    if driveSpeedX > maxSpeedX:
+        driveSpeedX = maxSpeedX
+    elif driveSpeedX < -maxSpeedX:
+        driveSpeedX = -maxSpeedX
 
     # Adjust z position 
     distanceZ = arucoPos[2] - targetDockingPos[2]
-    pid_distanceZ = PID(distanceZ, 0.3, 0.1, 0.1)
+    pid_distanceZ = abs(PID(distanceZ, 0.3, 0.1, 0.1))
     driveSpeedZ = pid_distanceZ
+    if driveSpeedZ > maxSpeedZ:
+        driveSpeedZ = maxSpeedZ
 
-    if angleDiff > targetDockingAng[2] and pid_distanceX > targetDockingPos[0] and pid_distanceZ > targetDockingPos[2] and completedDocking == False:
-        minimal_publisher.angularVec = (0.0, 0.0, -turnSpeedZ)
-        minimal_publisher.linearVec = (driveSpeedX, 0.0, driveSpeedZ)
+    if angleDiff > targetDockingAng[2] or pid_distanceX > targetDockingPos[0] or pid_distanceZ > targetDockingPos[2]:
+        minimal_publisher.angularVec = (pid_angleDiff, float(pid_angleDiff), -turnSpeedZ)
+        #print("turnSpeedZ: ", turnSpeedZ)
+        #print("driveSpeedX: ", driveSpeedX)
+        #print("driveSpeedZ: ", driveSpeedZ)
+        #minimal_publisher.linearVec = (driveSpeedZ, driveSpeedX, 0.0)
         rclpy.spin_once(minimal_publisher)
     else:
-        completedDocking = True
         print("Completed docking d8)")
-        startFeeder()
+        startFeeder(dockingActionServer)
 
-
-def startFeeder(img, amount, dockingActionServer, goal_handle, result):
-    dockingActionServer.dockSucced = True
+def startFeeder(dockingActionServer):
+    #dockingActionServer.dockSucced = True
     print('Docked!')
-
 
 def main(args=None):
 
@@ -271,52 +285,15 @@ def main(args=None):
     # Start ROS2 node
     rclpy.init(args=args)
 
-    # Create subscriber
-    minimal_subscriber = MinimalSubscriber()
-    minimal_publisher = MinimalPublisher()
+    # Start action server for docking
+    action_server = DockingActionServer()
 
-    # Start camera
-    cap = cv2.VideoCapture(0)
-
-    # Load camera parameters
-    mtx, dist = load_coefficients("cali.yml")
+    # Setup PID control in the future maybe?
 
     while True:
+        rclpy.spin(action_server)
 
-        # Check if we need to dock
-        if not minimal_subscriber.startDocking:
-            rclpy.spin_once(minimal_subscriber)
-        elif minimal_subscriber.startDocking:
-
-            __, img = cap.read()
-
-            foundArucos = findArucosMakers(img)
-            foundArucosMarkers = len(foundArucos[0])
-
-            if foundArucosMarkers > 0:
-                aruco.drawDetectedMarkers(img, foundArucos[0], foundArucos[1])
-                counter = 0
-                rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(foundArucos[0], 0.064, mtx, dist) # Aruco markers length are given in meters
-
-                hasSeenAruco = False
-                for __, id in zip(foundArucos[0], foundArucos[1]):
-                    counter += 1
-                    if id == minimal_subscriber.arucoMarkerID:
-                        controlDocking(minimal_publisher, rvecs, tvecs)
-                        hasSeenAruco = True
-                    elif id is not minimal_subscriber.arucoMarkerID and not hasSeenAruco:
-                        searchForAruco(minimal_publisher)
-            else:
-                print("No Aruco markers found")
-                searchForAruco(minimal_publisher)
-
-            cv2.waitKey(1)
-        
-        else:
-            continue
-
-
-    minimal_subscriber.destroy_node()
+    action_server.destroy_node()
     rclpy.shutdown()
 
 
