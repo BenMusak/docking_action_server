@@ -31,41 +31,90 @@ completedDocking = False
 integral, derivative, last_error = 0, 0, 0
 
 
-class MinimalSubscriber(Node):
+class DockingActionServer(Node):
 
-    """ Subscribes to the docking topic and listens for the keyword to start docking. """
-
-    global completedDocking
+    global arucoIDSearcher, ownMarkerID
 
     def __init__(self):
-        super().__init__('minimal_subscriber')
-        self.subscription = self.create_subscription(
-            String,
+        super().__init__('docking_action_server')
+        self._action_server = ActionServer(
+            self,
+            Docking,
             'docking',
-            self.listener_callback,
-            10)
-        self.subscription  # prevent unused variable warning
+            self.execute_callback)
         self.startDocking = False
-        self.arucoMarkerID = None
+        self.arucoMarkerID = 0
+        self.dockSucced = False
 
-    def listener_callback(self, msg):
-        self.get_logger().info('I heard: "%s"' % msg.data)
+    def execute_callback(self, goal_handle):
+        self.get_logger().info('Executing docking...')
+        feedback_msg = Docking.Feedback()
+        result = Docking.Result()
 
-        splitMsg = msg.data.split()
+        if goal_handle.request.start_docking and goal_handle.request.feeder_id == ownMarkerID:
+            self.dockSucced = False
+            self.startDocking = True
+            self.arucoMarkerID = goal_handle.request.carrier_id
+            print("feeder_id: ", goal_handle.request.feeder_id)
+            print('Starting to dock. Looking for carrier with an ID off: ' + str(arucoIDSearcher) + ".")
+            feedback_msg.is_docking = True
+            goal_handle.publish_feedback(feedback_msg)
+            print("Caling Function")
+            # Start camera
+            cap = cv2.VideoCapture(0)
 
-        try:
-            if splitMsg[0] == "start_docking" and int(splitMsg[1]) == ownMarkerID and splitMsg[2] is not None:
-                self.startDocking = True
-                self.arucoMarkerID = int(splitMsg[2])
-                print("Start Docking")
-                # ros2 topic pub /docking std_msgs/String '{data: start_docking}'
-            elif msg.data == "stop_docking":
-                completedDocking = False
-                self.startDocking = False
-            else:
-                print("Something went wrong with the Aruco Marker ID.")
-        except:
-            print("Not enough parameters to unpack on topic. Are you sure you gave 3 parameters?")
+            # Load camera parameters
+            mtx, dist = load_coefficients("/home/jetson/dev_ws/src/docking_action_server/commander/cali.yml")
+
+            # Start motor publisher to contorl robot
+            minimal_publisher = MinimalPublisher()
+            
+            while True:
+                __, img = cap.read()
+
+                foundArucos = findArucosMakers(img)
+                foundArucosMarkers = len(foundArucos[0])
+
+                if foundArucosMarkers > 0:
+                    aruco.drawDetectedMarkers(img, foundArucos[0], foundArucos[1])
+                    counter = 0
+                    rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(foundArucos[0], 0.048, mtx, dist) # Aruco markers length are given in meters
+
+                    hasSeenAruco = False
+                    for bbox, id in zip(foundArucos[0], foundArucos[1]):
+                        aruco.drawAxis(img, mtx, dist, rvecs[counter], tvecs[counter], 0.1)
+                        counter += 1
+                        
+                        if id == self.arucoMarkerID:
+                            controlDocking(minimal_publisher, img, rvecs, tvecs, self, goal_handle, result)
+                            hasSeenAruco = True
+                        elif id is not self.arucoMarkerID and not hasSeenAruco:
+                            searchForAruco(minimal_publisher)
+                else:
+                    print("No Aruco markers found")
+                    searchForAruco(minimal_publisher)
+            
+                cv2.imshow("Aruco Markers", img)
+                cv2.waitKey(1)
+
+                if self.dockSucced:
+                    goal_handle.succeed()
+
+                    result = Docking.Result()
+                    self.get_logger().info('Goal succeded...')
+
+                    result.docked = True
+                    return result
+
+        elif not goal_handle.request.start_docking:
+            self.startDocking = False
+            feedback_msg.is_docking = False
+            self.arucoMarkerID = 0
+            print("You requested me to not dock.")
+
+        #result.docked = True
+
+        return result
 
 
 class MinimalPublisher(Node):
@@ -210,8 +259,9 @@ def controlDocking(minimal_publisher, rvecs, tvecs):
         startFeeder()
 
 
-def startFeeder():
-    print("Feeder Startet")
+def startFeeder(img, amount, dockingActionServer, goal_handle, result):
+    dockingActionServer.dockSucced = True
+    print('Docked!')
 
 
 def main(args=None):
