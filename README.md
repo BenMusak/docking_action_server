@@ -3,9 +3,23 @@
 This is a docking action server reposetory for the P6-project:
 <https://github.com/kasperfg16/p6-swarm>
 
-# Setup
+## Installation
 
 This code is to be installed on the robot computer.
+
+This is done by connecting a mouse and keyboard to the robot computer. Then plug a monitor to the robot computer. From here:
+
+1. In a terminal
+
+    Clone the reposetory into a **PATH** of your choice
+
+    ``` bash
+    cd PATH/
+    ```
+
+    ``` bash
+    git clone https://github.com/BenMusak/docking_action_server
+    ```
 
 ## Update the docking code / Uploading of updates Over The Air (OTA)
 
